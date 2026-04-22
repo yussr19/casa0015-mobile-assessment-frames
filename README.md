@@ -1,17 +1,20 @@
-# REPLACE WITH YOUR APP NAME
+# FRAMES
 
 This is the Final assessment template for CASA0014 - Please use this template and edit the relevant sections to personalise.
 This section has a short introduction to what the application is
 
-## Use this README File 
+## storyboard
+The inital deisgns and layout were skecthed out on paper 
 
-Use this section to show us what your Mobile App is about.   Include a Screenshot to the App, link to the various frameworks you've used. Include your presentation video here that shows off your Mobile App.   Emojis are also fun to include 📱 😄
+<img width="3024" height="4032" alt="IMG_7212" src="https://github.com/user-attachments/assets/b4eb9c90-6963-4a7f-9671-5b33d22cb886" />
+<img width="3024" height="4032" alt="IMG_7212 2" src="https://github.com/user-attach<img width="1062" height="595" alt="Screenshot 2026-04-22 at 01 15 09" src="https://github.com/user-attachments/assets/5d4f58af-9827-4b5b-9fcf-7dc4d49e9998" />
+ments/assets/7055d746-3ab7-497c-bf74-c6b3e74d5001" />
+<img width="3024" height="4032" alt="IMG_7213" src="https://github.com/user-attachments/assets/6b3d4b71-8fff-4ad7-b835-73504a634d63" />
+the sketched were then flushed out more to really explore the user journey and experince the following skectked were made with clau<img width="1063" height="602" alt="Screenshot 2026-04-22 at 01 15 35" src="https://github.com/user-attachments/assets/fb95ff8d-6f6e-4f38-ac1f-cc760a59db02" />
+de assistance 
 
-Look at some other Flutter Apps online and see how they use there README File.  Good examples are:
 
-- https://github.com/miickel/flutter_particle_clock
-- https://github.com/Tarikul711/flutter-food-delivery-app-ui    
-- https://github.com/mohak1283/Instagram-Clone
+
 
 
 ## Include A Section That Tells Developers How To Install The App
