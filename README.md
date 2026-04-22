@@ -11,6 +11,9 @@ The inital deisgns and layout were skecthed out on paper
   <img src="https://github.com/user-attachments/assets/6b3d4b71-8fff-4ad7-b835-73504a634d63" width="250"/>
 </p>
 the sketched were then flushed out more to really explore the user journey and experince the following skectked were made with claude assistance 
+
+<img width="1063" height="595" alt="Screenshot 2026-04-22 at 01 20 50" src="https://github.com/user-attachments/assets/5bf6384d-8395-43da-98b2-1e23d82c35b9" />
+
 <img width="1063" height="602" alt="Screenshot 2026-04-22 at 01 15 35" src="https://github.com/user-attachments/assets/fb95ff8d-6f6e-4f38-ac1f-cc760a59db02" />
 
 
