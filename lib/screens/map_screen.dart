@@ -57,6 +57,7 @@ class _MapScreenState extends State<MapScreen>
 
   void _loadData() async {
     final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+      print('current user id: $userId');
     final doors = await _firestoreService.getDoors();
     final foundIds = await _firestoreService.getFoundDoors(userId);
 
