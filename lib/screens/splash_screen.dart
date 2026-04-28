@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'map_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -88,15 +87,15 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 children: [
                   const Text(
-                            'FRAMES',
-                           style: TextStyle(
-                            fontSize: 40,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFFE8C060),
-                                letterSpacing: 12,
-                            fontFamily: 'Georgia',
-  ),
-),
+                    'FRAMES',
+                    style: TextStyle(
+                      fontSize: 40,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFFE8C060),
+                      letterSpacing: 12,
+                      fontFamily: 'Georgia',
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     _isLoading ? 'opening...' : 'knock to enter',
@@ -213,6 +212,7 @@ class _SplashScreenState extends State<SplashScreen>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      // gold backplate with lion face
                       Container(
                         width: 100,
                         height: 100,
@@ -246,10 +246,10 @@ class _SplashScreenState extends State<SplashScreen>
                             width: 2.5,
                           ),
                         ),
-                        child: const Center(
-                          child: Text(
-                            '🦁',
-                            style: TextStyle(fontSize: 52),
+                        child: Center(
+                          child: CustomPaint(
+                            size: const Size(70, 70),
+                            painter: LionFacePainter(),
                           ),
                         ),
                       ),
@@ -297,6 +297,130 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
+// lion face painter - works on all platforms including simulator
+class LionFacePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+
+    // outer mane
+    canvas.drawCircle(
+      Offset(cx, cy),
+      size.width * 0.46,
+      Paint()..color = const Color(0xFFC8860A),
+    );
+
+    // mane detail lines
+    final maneLinePaint = Paint()
+      ..color = const Color(0xFF8B5A00)
+      ..strokeWidth = 1.2
+      ..style = PaintingStyle.stroke;
+
+    for (int i = 0; i < 8; i++) {
+      double angle = (i * 45) * (3.14159 / 180);
+      double innerR = size.width * 0.32;
+      double outerR = size.width * 0.46;
+      canvas.drawLine(
+        Offset(cx + innerR * 0.8 * (i % 2 == 0 ? 1 : -1) * 0.5,
+            cy + innerR * 0.8 * (i < 4 ? -1 : 1) * 0.3),
+        Offset(cx + outerR * (i % 2 == 0 ? 1 : -1) * 0.4,
+            cy + outerR * (i < 4 ? -1 : 1) * 0.6),
+        maneLinePaint,
+      );
+    }
+
+    // face
+    canvas.drawCircle(
+      Offset(cx, cy),
+      size.width * 0.30,
+      Paint()..color = const Color(0xFFD4940C),
+    );
+
+    // eyes
+    canvas.drawOval(
+      Rect.fromCenter(
+          center: Offset(cx - 8, cy - 7), width: 9, height: 6),
+      Paint()..color = const Color(0xFF1A0A00),
+    );
+    canvas.drawOval(
+      Rect.fromCenter(
+          center: Offset(cx + 8, cy - 7), width: 9, height: 6),
+      Paint()..color = const Color(0xFF1A0A00),
+    );
+
+    // eye shine
+    canvas.drawCircle(
+      Offset(cx - 6, cy - 8),
+      1.5,
+      Paint()..color = Colors.white.withValues(alpha: 0.7),
+    );
+    canvas.drawCircle(
+      Offset(cx + 10, cy - 8),
+      1.5,
+      Paint()..color = Colors.white.withValues(alpha: 0.7),
+    );
+
+    // brow furrow
+    canvas.drawLine(
+      Offset(cx - 11, cy - 11),
+      Offset(cx - 5, cy - 9),
+      Paint()
+        ..color = const Color(0xFF8B5A00)
+        ..strokeWidth = 1.5
+        ..strokeCap = StrokeCap.round,
+    );
+    canvas.drawLine(
+      Offset(cx + 11, cy - 11),
+      Offset(cx + 5, cy - 9),
+      Paint()
+        ..color = const Color(0xFF8B5A00)
+        ..strokeWidth = 1.5
+        ..strokeCap = StrokeCap.round,
+    );
+
+    // nose
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(cx, cy - 1), width: 11, height: 7),
+      Paint()..color = const Color(0xFF5A2800),
+    );
+    // nostrils
+    canvas.drawOval(
+      Rect.fromCenter(
+          center: Offset(cx - 2.5, cy - 0.5), width: 3, height: 2),
+      Paint()..color = const Color(0xFF2A1000),
+    );
+    canvas.drawOval(
+      Rect.fromCenter(
+          center: Offset(cx + 2.5, cy - 0.5), width: 3, height: 2),
+      Paint()..color = const Color(0xFF2A1000),
+    );
+
+    // mouth
+    final mouthPath = Path();
+    mouthPath.moveTo(cx - 8, cy + 6);
+    mouthPath.quadraticBezierTo(cx, cy + 13, cx + 8, cy + 6);
+    canvas.drawPath(
+      mouthPath,
+      Paint()
+        ..color = const Color(0xFF3A1800)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.8
+        ..strokeCap = StrokeCap.round,
+    );
+
+    // chin tuft
+    canvas.drawOval(
+      Rect.fromCenter(
+          center: Offset(cx, cy + 16), width: 14, height: 9),
+      Paint()..color = const Color(0xFFC88018),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
 // liverpool map as stained glass
 class StainedGlassPainter extends CustomPainter {
   @override
@@ -332,7 +456,6 @@ class StainedGlassPainter extends CustomPainter {
       Offset(0, h * 0.80),
     ], const Color(0xFF0A2A6E));
 
-    // river shimmer 1
     _piece(canvas, fill, lead, [
       Offset(w * 0.1, h * 0.70),
       Offset(w * 0.3, h * 0.67),
@@ -340,7 +463,6 @@ class StainedGlassPainter extends CustomPainter {
       Offset(w * 0.08, h * 0.74),
     ], const Color(0xFF1A3A8E));
 
-    // river shimmer 2
     _piece(canvas, fill, lead, [
       Offset(w * 0.5, h * 0.65),
       Offset(w * 0.7, h * 0.67),
@@ -348,7 +470,6 @@ class StainedGlassPainter extends CustomPainter {
       Offset(w * 0.48, h * 0.70),
     ], const Color(0xFF1A3A8E));
 
-    // waterfront
     _piece(canvas, fill, lead, [
       Offset(0, h * 0.52),
       Offset(w * 0.14, h * 0.50),
@@ -356,7 +477,6 @@ class StainedGlassPainter extends CustomPainter {
       Offset(0, h * 0.68),
     ], const Color(0xFF8B6000));
 
-    // albert dock
     _piece(canvas, fill, lead, [
       Offset(0, h * 0.80),
       Offset(w * 0.25, h * 0.83),
@@ -364,7 +484,6 @@ class StainedGlassPainter extends CustomPainter {
       Offset(0, h),
     ], const Color(0xFF7A4800));
 
-    // dock road
     _piece(canvas, fill, lead, [
       Offset(0, h * 0.25),
       Offset(w * 0.12, h * 0.22),
@@ -372,7 +491,6 @@ class StainedGlassPainter extends CustomPainter {
       Offset(0, h * 0.52),
     ], const Color(0xFF6B3A00));
 
-    // lime street
     _piece(canvas, fill, lead, [
       Offset(0, 0),
       Offset(w * 0.32, 0),
@@ -381,7 +499,6 @@ class StainedGlassPainter extends CustomPainter {
       Offset(0, h * 0.25),
     ], const Color(0xFF8B0000));
 
-    // bold street
     _piece(canvas, fill, lead, [
       Offset(w * 0.32, 0),
       Offset(w * 0.62, 0),
@@ -390,7 +507,6 @@ class StainedGlassPainter extends CustomPainter {
       Offset(w * 0.30, h * 0.22),
     ], const Color(0xFF00006B));
 
-    // castle street
     _piece(canvas, fill, lead, [
       Offset(w * 0.62, 0),
       Offset(w, 0),
@@ -399,7 +515,6 @@ class StainedGlassPainter extends CustomPainter {
       Offset(w * 0.60, h * 0.18),
     ], const Color(0xFFB8860B));
 
-    // ropewalks
     _piece(canvas, fill, lead, [
       Offset(w * 0.12, h * 0.22),
       Offset(w * 0.30, h * 0.22),
@@ -407,7 +522,6 @@ class StainedGlassPainter extends CustomPainter {
       Offset(w * 0.14, h * 0.50),
     ], const Color(0xFF005000));
 
-    // liverpool one
     _piece(canvas, fill, lead, [
       Offset(w * 0.30, h * 0.22),
       Offset(w * 0.42, h * 0.24),
@@ -416,7 +530,6 @@ class StainedGlassPainter extends CustomPainter {
       Offset(w * 0.28, h * 0.42),
     ], const Color(0xFF7A0000));
 
-    // dale street
     _piece(canvas, fill, lead, [
       Offset(w * 0.42, h * 0.24),
       Offset(w * 0.60, h * 0.18),
@@ -425,7 +538,6 @@ class StainedGlassPainter extends CustomPainter {
       Offset(w * 0.55, h * 0.38),
     ], const Color(0xFF3A006B));
 
-    // water street
     _piece(canvas, fill, lead, [
       Offset(w * 0.72, h * 0.22),
       Offset(w, h * 0.20),
@@ -434,7 +546,6 @@ class StainedGlassPainter extends CustomPainter {
       Offset(w * 0.68, h * 0.40),
     ], const Color(0xFFD4A010));
 
-    // baltic triangle
     _piece(canvas, fill, lead, [
       Offset(w * 0.14, h * 0.50),
       Offset(w * 0.28, h * 0.42),
@@ -443,7 +554,6 @@ class StainedGlassPainter extends CustomPainter {
       Offset(w * 0.15, h * 0.64),
     ], const Color(0xFF6B0000));
 
-    // seel street
     _piece(canvas, fill, lead, [
       Offset(w * 0.48, h * 0.50),
       Offset(w * 0.55, h * 0.38),
@@ -454,7 +564,6 @@ class StainedGlassPainter extends CustomPainter {
       Offset(w * 0.45, h * 0.62),
     ], const Color(0xFF00005A));
 
-    // far right
     _piece(canvas, fill, lead, [
       Offset(w * 0.78, h * 0.52),
       Offset(w, h * 0.48),
@@ -462,7 +571,6 @@ class StainedGlassPainter extends CustomPainter {
       Offset(w * 0.75, h * 0.65),
     ], const Color(0xFFB8860B));
 
-    // bottom centre
     _piece(canvas, fill, lead, [
       Offset(w * 0.25, h * 0.83),
       Offset(w * 0.48, h * 0.79),
@@ -470,7 +578,6 @@ class StainedGlassPainter extends CustomPainter {
       Offset(w * 0.22, h),
     ], const Color(0xFFB8860B));
 
-    // bottom right
     _piece(canvas, fill, lead, [
       Offset(w * 0.48, h * 0.79),
       Offset(w * 0.72, h * 0.82),
