@@ -89,7 +89,7 @@ class _SplashScreenState extends State<SplashScreen>
                   const Text(
                     'FRAMES',
                     style: TextStyle(
-                      fontSize: 40,
+                      fontSize: 42,
                       fontWeight: FontWeight.w700,
                       color: Color(0xFFE8C060),
                       letterSpacing: 12,
