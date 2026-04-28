@@ -8,6 +8,7 @@ import 'package:frames_app/screens/qr_scanner_screen.dart';
 import 'package:frames_app/screens/collection_screen.dart';
 import 'package:frames_app/screens/progress_screen.dart';
 import 'package:frames_app/screens/profile_screen.dart';
+import 'package:frames_app/screens/artist_card_screen.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -57,7 +58,7 @@ class _MapScreenState extends State<MapScreen>
 
   void _loadData() async {
     final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
-      print('current user id: $userId');
+    print('current user id: $userId');
     final doors = await _firestoreService.getDoors();
     final foundIds = await _firestoreService.getFoundDoors(userId);
 
@@ -86,16 +87,26 @@ class _MapScreenState extends State<MapScreen>
               : BitmapDescriptor.defaultMarkerWithHue(
                   BitmapDescriptor.hueAzure),
           infoWindow: InfoWindow(
-            title: isFound ? door.street : '🚪 Hidden Door',
+            title: isFound ? door.street : 'Hidden Door',
             snippet: isFound
-                ? '📍 ${door.neighbourhood} · tap to view artist'
-                : '🔍 Walk here to unlock this door',
+                ? '${door.neighbourhood} - tap to view artist'
+                : 'Walk here to unlock this door',
           ),
+          onTap: isFound
+    ? () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ArtistCardScreen(door: door),
+          ),
+        );
+      }
+    : null,
         ),
       );
     }
 
-    // add green dot for user position
+    // green dot for user position
     if (_currentPosition != null) {
       markers.add(
         Marker(
@@ -130,7 +141,6 @@ class _MapScreenState extends State<MapScreen>
         setState(() {
           _currentPosition = position;
         });
-        // rebuild markers to add green dot
         _buildMarkers();
       }
     } catch (e) {
@@ -161,7 +171,7 @@ class _MapScreenState extends State<MapScreen>
             mapToolbarEnabled: false,
           ),
 
-          // radar pulse - IgnorePointer keeps map scrollable
+          // radar pulse
           Positioned.fill(
             child: IgnorePointer(
               child: AnimatedBuilder(
