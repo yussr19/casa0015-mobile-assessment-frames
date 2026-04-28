@@ -33,6 +33,10 @@ dependencies:
   # Sharing
   share_plus: ^10.1.2
 
+   # Fonts
+  google_fonts: ^6.2.1
+
+
   # Utils
   cupertino_icons: ^1.0.8
 

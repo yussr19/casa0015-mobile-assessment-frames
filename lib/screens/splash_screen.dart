@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'map_screen.dart';
 
-// first screen the user sees - the door with lion knocker
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -19,12 +20,11 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    // knocker bounce animation
     _knockController = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _knockAnimation = Tween<double>(begin: 0, end: -8).animate(
+    _knockAnimation = Tween<double>(begin: 0, end: -14).animate(
       CurvedAnimation(parent: _knockController, curve: Curves.easeInOut),
     );
   }
@@ -35,22 +35,20 @@ class _SplashScreenState extends State<SplashScreen>
     super.dispose();
   }
 
-  // called when user taps the knocker
   void _handleKnock() async {
     if (_isLoading) return;
-
-    // play knock animation
+    HapticFeedback.heavyImpact();
     await _knockController.forward();
     await _knockController.reverse();
+    await Future.delayed(const Duration(milliseconds: 100));
+    HapticFeedback.heavyImpact();
     await _knockController.forward();
     await _knockController.reverse();
 
     setState(() => _isLoading = true);
 
     try {
-      // sign in anonymously so we can track found doors
       await FirebaseAuth.instance.signInAnonymously();
-
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -74,40 +72,38 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1208),
+      backgroundColor: const Color(0xFF0D0804),
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 12),
-            // status bar spacer
+            const SizedBox(height: 16),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: _buildDoor(),
               ),
             ),
-            // app name and hint at bottom
             Padding(
-              padding: const EdgeInsets.only(bottom: 24),
+              padding: const EdgeInsets.only(bottom: 28, top: 14),
               child: Column(
                 children: [
-                  Text(
-                    'FRAMES',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFFE8C060),
-                      letterSpacing: 6,
-                      fontFamily: 'Georgia',
-                    ),
-                  ),
-                  const SizedBox(height: 6),
+                  const Text(
+                            'FRAMES',
+                           style: TextStyle(
+                            fontSize: 40,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFE8C060),
+                                letterSpacing: 12,
+                            fontFamily: 'Georgia',
+  ),
+),
+                  const SizedBox(height: 8),
                   Text(
                     _isLoading ? 'opening...' : 'knock to enter',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: const Color(0xFF6A5030),
-                      letterSpacing: 2,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF6A5030),
+                      letterSpacing: 3,
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -125,66 +121,70 @@ class _SplashScreenState extends State<SplashScreen>
       width: double.infinity,
       decoration: BoxDecoration(
         color: const Color(0xFF1A0E04),
-        border: Border.all(color: const Color(0xFF8B5518), width: 6),
-        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: const Color(0xFF8B5518), width: 7),
+        borderRadius: BorderRadius.circular(4),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.5),
-            blurRadius: 20,
+            color: Colors.black.withValues(alpha: 0.8),
+            blurRadius: 24,
             offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Stack(
         children: [
-          // door split line down the middle
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
+          // door centre split
+          Positioned.fill(
             child: Center(
-              child: Container(
-                width: 2,
-                color: const Color(0xFF4A2808),
-              ),
+              child: Container(width: 3, color: const Color(0xFF5A3010)),
             ),
           ),
 
           Column(
             children: [
-              // stained glass window at top
-              _buildStainedGlassWindow(),
+              // stained glass window
+              Container(
+                height: 220,
+                margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0xFF5A3010),
+                    width: 4,
+                  ),
+                ),
+                child: ClipRect(
+                  child: CustomPaint(
+                    painter: StainedGlassPainter(),
+                    size: Size.infinite,
+                  ),
+                ),
+              ),
 
-              // door panels below window
+              // door panels
               Expanded(
                 child: Row(
                   children: [
-                    // left panel
                     Expanded(
                       child: Container(
-                        margin: const EdgeInsets.fromLTRB(8, 8, 4, 8),
+                        margin: const EdgeInsets.fromLTRB(10, 8, 5, 10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF120A02),
+                          color: const Color(0xFF0E0602),
                           border: Border.all(
-                            color: const Color(0xFF4A2808),
-                            width: 1.5,
+                            color: const Color(0xFF3A2006),
+                            width: 2,
                           ),
-                          borderRadius: BorderRadius.circular(3),
                         ),
                       ),
                     ),
-                    // right panel
                     Expanded(
                       child: Container(
-                        margin: const EdgeInsets.fromLTRB(4, 8, 8, 8),
+                        margin: const EdgeInsets.fromLTRB(5, 8, 10, 10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF120A02),
+                          color: const Color(0xFF0E0602),
                           border: Border.all(
-                            color: const Color(0xFF4A2808),
-                            width: 1.5,
+                            color: const Color(0xFF3A2006),
+                            width: 2,
                           ),
-                          borderRadius: BorderRadius.circular(3),
                         ),
                       ),
                     ),
@@ -194,11 +194,11 @@ class _SplashScreenState extends State<SplashScreen>
             ],
           ),
 
-          // lion knocker - positioned at 2/3 down
+          // lion knocker
           Positioned(
             left: 0,
             right: 0,
-            top: MediaQuery.of(context).size.height * 0.38,
+            top: MediaQuery.of(context).size.height * 0.33,
             child: GestureDetector(
               onTap: _handleKnock,
               child: AnimatedBuilder(
@@ -209,7 +209,85 @@ class _SplashScreenState extends State<SplashScreen>
                     child: child,
                   );
                 },
-                child: Center(child: _buildLionKnocker()),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: const RadialGradient(
+                            center: Alignment(-0.3, -0.3),
+                            colors: [
+                              Color(0xFFE8C040),
+                              Color(0xFFC09010),
+                              Color(0xFF8B6200),
+                              Color(0xFF5A3E00),
+                            ],
+                            stops: [0.0, 0.4, 0.7, 1.0],
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFD4A017)
+                                  .withValues(alpha: 0.4),
+                              blurRadius: 16,
+                              spreadRadius: 2,
+                            ),
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.6),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                          border: Border.all(
+                            color: const Color(0xFF2A1800),
+                            width: 2.5,
+                          ),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            '🦁',
+                            style: TextStyle(fontSize: 52),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      // knocker ring
+                      Container(
+                        width: 50,
+                        height: 26,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(13),
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFFFFD700),
+                              Color(0xFFC09010),
+                              Color(0xFFFFD700),
+                            ],
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.5),
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Container(
+                          margin: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(9),
+                            color: const Color(0xFF1A0E04),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -217,130 +295,242 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
   }
-
-  Widget _buildStainedGlassWindow() {
-    return Container(
-      height: 180,
-      margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFF6B3F10), width: 3),
-        borderRadius: BorderRadius.circular(3),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(2),
-        child: CustomPaint(
-          painter: StainedGlassPainter(),
-          size: Size.infinite,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLionKnocker() {
-    return Container(
-      width: 64,
-      height: 64,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: const RadialGradient(
-          center: Alignment(-0.3, -0.3),
-          colors: [Color(0xFFF0C040), Color(0xFFC08010), Color(0xFF7A4A00)],
-        ),
-        border: Border.all(color: const Color(0xFF8B6020), width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.6),
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Text(
-          '🦁',
-          style: TextStyle(fontSize: 32),
-        ),
-      ),
-    );
-  }
 }
 
-// paints the stained glass liverpool street grid window
+// liverpool map as stained glass
 class StainedGlassPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    // amber background
+    final w = size.width;
+    final h = size.height;
+
     canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = const Color(0xFFC8780A),
+      Rect.fromLTWH(0, 0, w, h),
+      Paint()..color = const Color(0xFF020408),
     );
 
-    final colors = [
-      const Color(0xFFE8A020),
-      const Color(0xFFB85C08),
-      const Color(0xFFD4920C),
-      const Color(0xFFE8C030),
-      const Color(0xFFC06010),
-      const Color(0xFFA03808),
-      const Color(0xFF8B1A08), // river mersey band
-      const Color(0xFFD48818),
-      const Color(0xFFB04008),
-    ];
+    final fill = Paint()..style = PaintingStyle.fill;
+    final lead = Paint()
+      ..color = const Color(0xFF080808)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.8
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
 
-    // draw street grid blocks
-    double blockH = size.height / 6;
-    double blockW = size.width / 5;
+    // river mersey
+    _piece(canvas, fill, lead, [
+      Offset(0, h * 0.68),
+      Offset(w * 0.15, h * 0.64),
+      Offset(w * 0.35, h * 0.66),
+      Offset(w * 0.55, h * 0.62),
+      Offset(w * 0.75, h * 0.65),
+      Offset(w, h * 0.60),
+      Offset(w, h * 0.78),
+      Offset(w * 0.72, h * 0.82),
+      Offset(w * 0.48, h * 0.79),
+      Offset(w * 0.25, h * 0.83),
+      Offset(0, h * 0.80),
+    ], const Color(0xFF0A2A6E));
 
-    for (int row = 0; row < 6; row++) {
-      for (int col = 0; col < 5; col++) {
-        final paint = Paint()
-          ..color = colors[(row * 5 + col) % colors.length];
-        canvas.drawRect(
-          Rect.fromLTWH(
-            col * blockW,
-            row * blockH,
-            blockW,
-            blockH,
-          ),
-          paint,
-        );
-      }
-    }
+    // river shimmer 1
+    _piece(canvas, fill, lead, [
+      Offset(w * 0.1, h * 0.70),
+      Offset(w * 0.3, h * 0.67),
+      Offset(w * 0.28, h * 0.72),
+      Offset(w * 0.08, h * 0.74),
+    ], const Color(0xFF1A3A8E));
 
-    // draw lead lines horizontal
-    final leadPaint = Paint()
-      ..color = const Color(0xFF1A0C02)
-      ..strokeWidth = 2.5;
+    // river shimmer 2
+    _piece(canvas, fill, lead, [
+      Offset(w * 0.5, h * 0.65),
+      Offset(w * 0.7, h * 0.67),
+      Offset(w * 0.68, h * 0.72),
+      Offset(w * 0.48, h * 0.70),
+    ], const Color(0xFF1A3A8E));
 
-    for (int i = 1; i < 6; i++) {
-      canvas.drawLine(
-        Offset(0, i * blockH),
-        Offset(size.width, i * blockH),
-        leadPaint,
-      );
-    }
+    // waterfront
+    _piece(canvas, fill, lead, [
+      Offset(0, h * 0.52),
+      Offset(w * 0.14, h * 0.50),
+      Offset(w * 0.16, h * 0.64),
+      Offset(0, h * 0.68),
+    ], const Color(0xFF8B6000));
 
-    // draw lead lines vertical
-    for (int i = 1; i < 5; i++) {
-      canvas.drawLine(
-        Offset(i * blockW, 0),
-        Offset(i * blockW, size.height),
-        leadPaint,
-      );
-    }
+    // albert dock
+    _piece(canvas, fill, lead, [
+      Offset(0, h * 0.80),
+      Offset(w * 0.25, h * 0.83),
+      Offset(w * 0.22, h),
+      Offset(0, h),
+    ], const Color(0xFF7A4800));
 
-    // warm glow overlay
-    final glowPaint = Paint()
+    // dock road
+    _piece(canvas, fill, lead, [
+      Offset(0, h * 0.25),
+      Offset(w * 0.12, h * 0.22),
+      Offset(w * 0.14, h * 0.50),
+      Offset(0, h * 0.52),
+    ], const Color(0xFF6B3A00));
+
+    // lime street
+    _piece(canvas, fill, lead, [
+      Offset(0, 0),
+      Offset(w * 0.32, 0),
+      Offset(w * 0.30, h * 0.22),
+      Offset(w * 0.12, h * 0.22),
+      Offset(0, h * 0.25),
+    ], const Color(0xFF8B0000));
+
+    // bold street
+    _piece(canvas, fill, lead, [
+      Offset(w * 0.32, 0),
+      Offset(w * 0.62, 0),
+      Offset(w * 0.60, h * 0.18),
+      Offset(w * 0.42, h * 0.24),
+      Offset(w * 0.30, h * 0.22),
+    ], const Color(0xFF00006B));
+
+    // castle street
+    _piece(canvas, fill, lead, [
+      Offset(w * 0.62, 0),
+      Offset(w, 0),
+      Offset(w, h * 0.20),
+      Offset(w * 0.72, h * 0.22),
+      Offset(w * 0.60, h * 0.18),
+    ], const Color(0xFFB8860B));
+
+    // ropewalks
+    _piece(canvas, fill, lead, [
+      Offset(w * 0.12, h * 0.22),
+      Offset(w * 0.30, h * 0.22),
+      Offset(w * 0.28, h * 0.42),
+      Offset(w * 0.14, h * 0.50),
+    ], const Color(0xFF005000));
+
+    // liverpool one
+    _piece(canvas, fill, lead, [
+      Offset(w * 0.30, h * 0.22),
+      Offset(w * 0.42, h * 0.24),
+      Offset(w * 0.55, h * 0.38),
+      Offset(w * 0.48, h * 0.50),
+      Offset(w * 0.28, h * 0.42),
+    ], const Color(0xFF7A0000));
+
+    // dale street
+    _piece(canvas, fill, lead, [
+      Offset(w * 0.42, h * 0.24),
+      Offset(w * 0.60, h * 0.18),
+      Offset(w * 0.72, h * 0.22),
+      Offset(w * 0.68, h * 0.40),
+      Offset(w * 0.55, h * 0.38),
+    ], const Color(0xFF3A006B));
+
+    // water street
+    _piece(canvas, fill, lead, [
+      Offset(w * 0.72, h * 0.22),
+      Offset(w, h * 0.20),
+      Offset(w, h * 0.48),
+      Offset(w * 0.78, h * 0.52),
+      Offset(w * 0.68, h * 0.40),
+    ], const Color(0xFFD4A010));
+
+    // baltic triangle
+    _piece(canvas, fill, lead, [
+      Offset(w * 0.14, h * 0.50),
+      Offset(w * 0.28, h * 0.42),
+      Offset(w * 0.48, h * 0.50),
+      Offset(w * 0.45, h * 0.62),
+      Offset(w * 0.15, h * 0.64),
+    ], const Color(0xFF6B0000));
+
+    // seel street
+    _piece(canvas, fill, lead, [
+      Offset(w * 0.48, h * 0.50),
+      Offset(w * 0.55, h * 0.38),
+      Offset(w * 0.68, h * 0.40),
+      Offset(w * 0.78, h * 0.52),
+      Offset(w * 0.75, h * 0.65),
+      Offset(w * 0.55, h * 0.62),
+      Offset(w * 0.45, h * 0.62),
+    ], const Color(0xFF00005A));
+
+    // far right
+    _piece(canvas, fill, lead, [
+      Offset(w * 0.78, h * 0.52),
+      Offset(w, h * 0.48),
+      Offset(w, h * 0.60),
+      Offset(w * 0.75, h * 0.65),
+    ], const Color(0xFFB8860B));
+
+    // bottom centre
+    _piece(canvas, fill, lead, [
+      Offset(w * 0.25, h * 0.83),
+      Offset(w * 0.48, h * 0.79),
+      Offset(w * 0.46, h),
+      Offset(w * 0.22, h),
+    ], const Color(0xFFB8860B));
+
+    // bottom right
+    _piece(canvas, fill, lead, [
+      Offset(w * 0.48, h * 0.79),
+      Offset(w * 0.72, h * 0.82),
+      Offset(w, h * 0.78),
+      Offset(w, h),
+      Offset(w * 0.46, h),
+    ], const Color(0xFF8B0000));
+
+    // cathedral silhouette
+    final cathedralPath = Path();
+    cathedralPath.moveTo(w * 0.04, h * 0.22);
+    cathedralPath.lineTo(w * 0.04, h * 0.10);
+    cathedralPath.lineTo(w * 0.06, h * 0.06);
+    cathedralPath.lineTo(w * 0.08, h * 0.10);
+    cathedralPath.lineTo(w * 0.08, h * 0.07);
+    cathedralPath.lineTo(w * 0.10, h * 0.04);
+    cathedralPath.lineTo(w * 0.12, h * 0.07);
+    cathedralPath.lineTo(w * 0.12, h * 0.10);
+    cathedralPath.lineTo(w * 0.14, h * 0.10);
+    cathedralPath.lineTo(w * 0.14, h * 0.22);
+    cathedralPath.close();
+    canvas.drawPath(
+      cathedralPath,
+      Paint()..color = const Color(0xFF2A0000).withValues(alpha: 0.7),
+    );
+
+    // backlit glow
+    final glow = Paint()
       ..shader = RadialGradient(
+        center: const Alignment(0.1, -0.1),
+        radius: 1.0,
         colors: [
-          const Color(0xFFFFF4C0).withValues(alpha: 0.2),
-          const Color(0xFF8B4A00).withValues(alpha: 0.0),
+          Colors.white.withValues(alpha: 0.14),
+          Colors.white.withValues(alpha: 0.0),
         ],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+      ).createShader(Rect.fromLTWH(0, 0, w, h));
+    canvas.drawRect(Rect.fromLTWH(0, 0, w, h), glow);
 
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      glowPaint,
-    );
+    // edge vignette
+    final vignette = Paint()
+      ..shader = RadialGradient(
+        center: Alignment.center,
+        radius: 0.9,
+        colors: [
+          Colors.transparent,
+          Colors.black.withValues(alpha: 0.35),
+        ],
+      ).createShader(Rect.fromLTWH(0, 0, w, h));
+    canvas.drawRect(Rect.fromLTWH(0, 0, w, h), vignette);
+  }
+
+  void _piece(Canvas canvas, Paint fill, Paint lead,
+      List<Offset> pts, Color color) {
+    if (pts.length < 3) return;
+    final path = Path()..moveTo(pts[0].dx, pts[0].dy);
+    for (var p in pts.skip(1)) path.lineTo(p.dx, p.dy);
+    path.close();
+    fill.color = color.withValues(alpha: 0.88);
+    canvas.drawPath(path, fill);
+    canvas.drawPath(path, lead);
   }
 
   @override
