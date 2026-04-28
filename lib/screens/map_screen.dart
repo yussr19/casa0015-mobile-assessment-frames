@@ -418,7 +418,7 @@ class RadarPainter extends CustomPainter {
           Paint()
             ..color = const Color(0xFF8B4A10).withValues(alpha: opacity)
             ..style = PaintingStyle.stroke
-            ..strokeWidth = 2,
+            ..strokeWidth = 2.5,
         );
       }
     }
