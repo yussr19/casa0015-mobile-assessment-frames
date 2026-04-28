@@ -35,7 +35,8 @@ class Door {
       imageFile: data['imageFile'] ?? '',
       qrValue: data['qrValue'] ?? '',
       artistId: data['artistId'] ?? '',
-      isActive: data['isActive'] ?? true,
+      isActive: data['isActive'] as bool? ?? true,
+      
     );
   }
 }

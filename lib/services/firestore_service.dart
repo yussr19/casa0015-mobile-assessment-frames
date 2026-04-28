@@ -10,9 +10,16 @@ class FirestoreService {
   Future<List<Door>> getDoors() async {
     try {
       final snapshot = await _db.collection('doors').get();
-      return snapshot.docs
-          .map((doc) => Door.fromFirestore(doc.data()))
-          .toList();
+      final doors = <Door>[];
+      for (final doc in snapshot.docs) {
+        try {
+          final data = doc.data();
+          doors.add(Door.fromFirestore(data));
+        } catch (e) {
+          print('error parsing door ${doc.id}: $e');
+        }
+      }
+      return doors;
     } catch (e) {
       print('error loading doors: $e');
       return [];
