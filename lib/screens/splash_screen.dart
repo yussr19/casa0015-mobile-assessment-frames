@@ -193,7 +193,7 @@ class _SplashScreenState extends State<SplashScreen>
             ],
           ),
 
-          // lion knocker
+          // door knocker
           Positioned(
             left: 0,
             right: 0,
@@ -212,10 +212,10 @@ class _SplashScreenState extends State<SplashScreen>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // gold backplate with lion face
+                      // backplate
                       Container(
-                        width: 100,
-                        height: 100,
+                        width: 80,
+                        height: 80,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           gradient: const RadialGradient(
@@ -226,14 +226,14 @@ class _SplashScreenState extends State<SplashScreen>
                               Color(0xFF8B6200),
                               Color(0xFF5A3E00),
                             ],
-                            stops: [0.0, 0.4, 0.7, 1.0],
+                            stops: [0.0, 0.3, 0.7, 1.0],
                           ),
                           boxShadow: [
                             BoxShadow(
                               color: const Color(0xFFD4A017)
-                                  .withValues(alpha: 0.4),
+                                  .withValues(alpha: 0.5),
                               blurRadius: 16,
-                              spreadRadius: 2,
+                              spreadRadius: 3,
                             ),
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.6),
@@ -243,17 +243,31 @@ class _SplashScreenState extends State<SplashScreen>
                           ],
                           border: Border.all(
                             color: const Color(0xFF2A1800),
-                            width: 2.5,
+                            width: 3,
                           ),
                         ),
                         child: Center(
-                          child: CustomPaint(
-                            size: const Size(70, 70),
-                            painter: LionFacePainter(),
+                          child: Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: const RadialGradient(
+                                center: Alignment(-0.3, -0.3),
+                                colors: [
+                                  Color(0xFF5A3E00),
+                                  Color(0xFF2A1800),
+                                ],
+                              ),
+                              border: Border.all(
+                                color: const Color(0xFFE8C040),
+                                width: 1.5,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 3),
                       // knocker ring
                       Container(
                         width: 50,
@@ -297,130 +311,6 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
-// lion face painter - works on all platforms including simulator
-class LionFacePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final cx = size.width / 2;
-    final cy = size.height / 2;
-
-    // outer mane
-    canvas.drawCircle(
-      Offset(cx, cy),
-      size.width * 0.46,
-      Paint()..color = const Color(0xFFC8860A),
-    );
-
-    // mane detail lines
-    final maneLinePaint = Paint()
-      ..color = const Color(0xFF8B5A00)
-      ..strokeWidth = 1.2
-      ..style = PaintingStyle.stroke;
-
-    for (int i = 0; i < 8; i++) {
-      double angle = (i * 45) * (3.14159 / 180);
-      double innerR = size.width * 0.32;
-      double outerR = size.width * 0.46;
-      canvas.drawLine(
-        Offset(cx + innerR * 0.8 * (i % 2 == 0 ? 1 : -1) * 0.5,
-            cy + innerR * 0.8 * (i < 4 ? -1 : 1) * 0.3),
-        Offset(cx + outerR * (i % 2 == 0 ? 1 : -1) * 0.4,
-            cy + outerR * (i < 4 ? -1 : 1) * 0.6),
-        maneLinePaint,
-      );
-    }
-
-    // face
-    canvas.drawCircle(
-      Offset(cx, cy),
-      size.width * 0.30,
-      Paint()..color = const Color(0xFFD4940C),
-    );
-
-    // eyes
-    canvas.drawOval(
-      Rect.fromCenter(
-          center: Offset(cx - 8, cy - 7), width: 9, height: 6),
-      Paint()..color = const Color(0xFF1A0A00),
-    );
-    canvas.drawOval(
-      Rect.fromCenter(
-          center: Offset(cx + 8, cy - 7), width: 9, height: 6),
-      Paint()..color = const Color(0xFF1A0A00),
-    );
-
-    // eye shine
-    canvas.drawCircle(
-      Offset(cx - 6, cy - 8),
-      1.5,
-      Paint()..color = Colors.white.withValues(alpha: 0.7),
-    );
-    canvas.drawCircle(
-      Offset(cx + 10, cy - 8),
-      1.5,
-      Paint()..color = Colors.white.withValues(alpha: 0.7),
-    );
-
-    // brow furrow
-    canvas.drawLine(
-      Offset(cx - 11, cy - 11),
-      Offset(cx - 5, cy - 9),
-      Paint()
-        ..color = const Color(0xFF8B5A00)
-        ..strokeWidth = 1.5
-        ..strokeCap = StrokeCap.round,
-    );
-    canvas.drawLine(
-      Offset(cx + 11, cy - 11),
-      Offset(cx + 5, cy - 9),
-      Paint()
-        ..color = const Color(0xFF8B5A00)
-        ..strokeWidth = 1.5
-        ..strokeCap = StrokeCap.round,
-    );
-
-    // nose
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset(cx, cy - 1), width: 11, height: 7),
-      Paint()..color = const Color(0xFF5A2800),
-    );
-    // nostrils
-    canvas.drawOval(
-      Rect.fromCenter(
-          center: Offset(cx - 2.5, cy - 0.5), width: 3, height: 2),
-      Paint()..color = const Color(0xFF2A1000),
-    );
-    canvas.drawOval(
-      Rect.fromCenter(
-          center: Offset(cx + 2.5, cy - 0.5), width: 3, height: 2),
-      Paint()..color = const Color(0xFF2A1000),
-    );
-
-    // mouth
-    final mouthPath = Path();
-    mouthPath.moveTo(cx - 8, cy + 6);
-    mouthPath.quadraticBezierTo(cx, cy + 13, cx + 8, cy + 6);
-    canvas.drawPath(
-      mouthPath,
-      Paint()
-        ..color = const Color(0xFF3A1800)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.8
-        ..strokeCap = StrokeCap.round,
-    );
-
-    // chin tuft
-    canvas.drawOval(
-      Rect.fromCenter(
-          center: Offset(cx, cy + 16), width: 14, height: 9),
-      Paint()..color = const Color(0xFFC88018),
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
 // liverpool map as stained glass
 class StainedGlassPainter extends CustomPainter {
   @override
@@ -441,7 +331,6 @@ class StainedGlassPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
-    // river mersey
     _piece(canvas, fill, lead, [
       Offset(0, h * 0.68),
       Offset(w * 0.15, h * 0.64),
