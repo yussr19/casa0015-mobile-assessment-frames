@@ -14,7 +14,6 @@ class ProgressScreen extends StatefulWidget {
 class _ProgressScreenState extends State<ProgressScreen> {
   final FirestoreService _firestoreService = FirestoreService();
   List<String> _foundDoorIds = [];
-  int _rank = 0;
   bool _isLoading = true;
 
   @override
@@ -32,6 +31,20 @@ class _ProgressScreenState extends State<ProgressScreen> {
     });
   }
 
+  int get _totalPoints {
+    int points = 0;
+    for (final id in _foundDoorIds) {
+      if (['door_005', 'door_006', 'door_008'].contains(id)) {
+        points += 50;
+      } else if (['door_002', 'door_004', 'door_007'].contains(id)) {
+        points += 25;
+      } else {
+        points += 10;
+      }
+    }
+    return points;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +52,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // top bar
             Container(
               color: const Color(0xFF2A1A08),
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
@@ -72,50 +84,19 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   // stats row
                   Row(
                     children: [
-                      _statPill(
-                          '${_foundDoorIds.length}', 'Doors Found'),
+                      _statPill('${_foundDoorIds.length}', 'Doors Found'),
                       const SizedBox(width: 8),
                       _statPill('3', 'Areas'),
                       const SizedBox(width: 8),
-                      _statPill(
-                          '${(_foundDoorIds.length * 10)}', 'Points'),
+                      _statPill('$_totalPoints', 'Points'),
                       const SizedBox(width: 8),
-                      // rank badge
-                      Container(
-                        width: 64,
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF8B4A10),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          children: [
-                            const Text(
-                              '#1',
-                              style: TextStyle(
-                                fontFamily: 'Georgia',
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFFE8C060),
-                              ),
-                            ),
-                            const Text(
-                              'Rank',
-                              style: TextStyle(
-                                fontSize: 8,
-                                color: Color(0xFFA08040),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      _statPill('3', 'Day Streak!'),
                     ],
                   ),
                 ],
               ),
             ),
 
-            // scrollable body
             Expanded(
               child: _isLoading
                   ? const Center(
@@ -127,14 +108,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // leaderboard section
                           _sectionHeader('Leaderboard', 'This week'),
                           _buildLeaderboard(),
-
-                          // friend activity
                           _sectionHeader('Friend Activity', 'See all'),
                           _buildActivityFeed(),
-
                           const SizedBox(height: 20),
                         ],
                       ),
@@ -160,7 +137,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
               value,
               style: const TextStyle(
                 fontFamily: 'Georgia',
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: Color(0xFFE8C060),
               ),
@@ -207,11 +184,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Widget _buildLeaderboard() {
-    // using streambuilder for live updates
     return StreamBuilder<QuerySnapshot>(
       stream: _firestoreService.getLeaderboard(),
       builder: (context, snapshot) {
-        // show placeholder data while loading
         final mockData = [
           {'name': 'Jamie T', 'doors': 14, 'isYou': false},
           {'name': 'You', 'doors': _foundDoorIds.length, 'isYou': true},
@@ -247,7 +222,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 ),
                 child: Row(
                   children: [
-                    // rank number
                     SizedBox(
                       width: 24,
                       child: Text(
@@ -264,8 +238,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         ),
                       ),
                     ),
-
-                    // avatar
                     Container(
                       width: 32,
                       height: 32,
@@ -289,8 +261,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
-
-                    // name
                     Expanded(
                       child: Text(
                         isYou ? 'You' : name,
@@ -301,8 +271,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         ),
                       ),
                     ),
-
-                    // score
                     Text(
                       '$doors doors',
                       style: const TextStyle(
@@ -322,7 +290,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Widget _buildActivityFeed() {
-    // activity feed with share functionality
     final activities = [
       {
         'name': 'Jamie T',
@@ -362,13 +329,12 @@ class _ProgressScreenState extends State<ProgressScreen> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // avatar
                 Container(
                   width: 30,
                   height: 30,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: const Color(0xFFE8E0D0),
+                    color: Color(0xFFE8E0D0),
                   ),
                   child: Center(
                     child: Text(
@@ -382,8 +348,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-
-                // text
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
