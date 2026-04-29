@@ -223,13 +223,37 @@ class _CollectionScreenState extends State<CollectionScreen> {
                   ),
                 ),
                 const Spacer(),
-                Text(
+               Row(
+                children: [
+                     if (foundCount == doors.length && doors.isNotEmpty)
+                      Container(
+        margin: const EdgeInsets.only(right: 6),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 8,
+          vertical: 2,
+           ),
+        decoration: BoxDecoration(
+          color: const Color(0xFFE8C060),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const Text(
+          'COMPLETE',
+          style: TextStyle(
+            fontSize: 8,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF2A1A08),
+                 ),
+                  ),
+                  ),
+                   Text(
                   '$foundCount / ${doors.length}',
                   style: const TextStyle(
                     fontSize: 11,
                     color: Color(0xFFA08040),
-                  ),
-                ),
+                        ),
+                        ),
+                        ],
+                        ),
               ],
             ),
           ),
