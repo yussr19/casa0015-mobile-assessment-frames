@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frames_app/models/door_model.dart';
 import 'package:frames_app/models/artist_model.dart';
 import 'package:frames_app/services/firestore_service.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ArtistCardScreen extends StatefulWidget {
   final Door door;
@@ -108,7 +109,6 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
       body: SafeArea(
         child: Column(
           children: [
-            // top bar
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
               child: Row(
@@ -161,7 +161,6 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
               ),
             ),
 
-            // card
             Expanded(
               child: Center(
                 child: _isLoading
@@ -195,7 +194,6 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
               ),
             ),
 
-            // hint
             Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
@@ -366,7 +364,6 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // bio
                   Text(
                     _artist?.bio.isNotEmpty == true
                         ? _artist!.bio
@@ -384,7 +381,7 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
                   Container(height: 0.5, color: const Color(0xFFDDD4BC)),
                   const SizedBox(height: 6),
 
-                  // artwork - tap to expand
+                  // artwork
                   GestureDetector(
                     onTap: _showArtworkFullscreen,
                     child: Container(
@@ -420,8 +417,7 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
                                     'Artwork coming soon',
                                     style: TextStyle(
                                       fontSize: 8,
-                                      color:
-                                          _doorColour.withValues(alpha: 0.5),
+                                      color: _doorColour.withValues(alpha: 0.5),
                                     ),
                                   ),
                                 ],
@@ -444,7 +440,6 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
                   Container(height: 0.5, color: const Color(0xFFDDD4BC)),
                   const SizedBox(height: 4),
 
-                  // style
                   if (_artist?.style.isNotEmpty == true)
                     Text(
                       _artist!.style,
@@ -480,31 +475,47 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
                     color: Color(0xFFA08040),
                   ),
                 ),
-              Row(
-  children: [
-    Text(
-      widget.door.rarityLabel,
-      style: TextStyle(
-        fontSize: 8,
-        color: widget.door.rarity == 3
-            ? const Color(0xFFE8C040)
-            : widget.door.rarity == 2
-                ? const Color(0xFFAAAAAA)
-                : const Color(0xFFA08040),
-                    ),
+                GestureDetector(
+                 onTap: () {
+                 final box = context.findRenderObject() as RenderBox?;
+                Share.share(
+                'I just discovered ${_artist?.name ?? 'an artist'} on Frames! '
+               'Find them at ${widget.door.street}, ${widget.door.neighbourhood} in Liverpool. '
+                   'Download Frames to discover more hidden artists 🚪',
+                    sharePositionOrigin: box == null
+                    ? null
+                       : box.localToGlobal(Offset.zero) & box.size,
+                        );
+                        },
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.share,
+                        size: 12,
+                        color: Color(0xFFA08040),
                       ),
-                           const SizedBox(width: 4),
-                         ...List.generate(3, (i) {
-                             return Icon(
-                       Icons.star,
-                     size: 10,
-                 color: i < widget.door.rarity
-                  ? const Color(0xFFE8C040)
-                 : const Color(0xFF4A3018),
-      );
-    }),
-  ],
-),
+                      const SizedBox(width: 4),
+                      const Text(
+                        'Share',
+                        style: TextStyle(
+                          fontSize: 9,
+                          color: Color(0xFFA08040),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  children: List.generate(3, (i) {
+                    return Icon(
+                      Icons.star,
+                      size: 10,
+                      color: i < widget.door.rarity
+                          ? const Color(0xFFE8C040)
+                          : const Color(0xFF4A3018),
+                    );
+                  }),
+                ),
               ],
             ),
           ),
