@@ -382,7 +382,7 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
                       }
                     },
                     child: Container(
-                      height: 100,
+                      height: 120,
                       decoration: BoxDecoration(
                         color: _doorColour.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(6),
@@ -395,7 +395,8 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
                               borderRadius: BorderRadius.circular(6),
                               child: Image.network(
                                 _artist!.artworkUrl,
-                                fit: BoxFit.cover,
+                                fit: BoxFit.contain,
+                                alignment: Alignment.topCenter,
                                 width: double.infinity,
                               ),
                             )
@@ -422,7 +423,7 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
                     ),
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 6),
                   Container(
                       height: 0.5,
                       color: const Color(0xFFDDD4BC)),
