@@ -48,6 +48,8 @@ class _SplashScreenState extends State<SplashScreen>
 
     try {
       await FirebaseAuth.instance.signInAnonymously();
+      final debugUser = FirebaseAuth.instance.currentUser;
+      print('SIMULATOR UID: ${debugUser?.uid}');
       if (mounted) {
         Navigator.pushReplacement(
           context,

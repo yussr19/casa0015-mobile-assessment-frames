@@ -461,10 +461,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     );
                                     }),
                     _settingsRow('Sign Out', Icons.logout,
-                        isDestructive: true, onTap: () async {
+                    isDestructive: true, onTap: () async {
                       await FirebaseAuth.instance.signOut();
-                      if (mounted) Navigator.pop(context);
-                    }),
+                    if (mounted) {
+                     Navigator.of(context).pushNamedAndRemoveUntil(
+                     '/login',
+                      (route) => false,
+                        );
+                           }
+                        }),
 
                     const SizedBox(height: 30),
                   ],
