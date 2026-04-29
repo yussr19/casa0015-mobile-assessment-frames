@@ -33,8 +33,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
 
   List<String> get _neighbourhoods => _doorsByNeighbourhood.keys.toList();
 
-  // colour per neighbourhood
-  Color _neighbourhoodColour(String hood) {
+ Color _neighbourhoodColour(String hood) {
     switch (hood) {
       case 'City Centre':
         return const Color(0xFF8B0000);
@@ -48,6 +47,84 @@ class _CollectionScreenState extends State<CollectionScreen> {
         return const Color(0xFF8B4A10);
     }
   }
+
+  void _showCompletionDialog(String hood, Color colour) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          margin: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1208),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: colour, width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: colour.withValues(alpha: 0.4),
+                blurRadius: 30,
+                spreadRadius: 5,
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.emoji_events,
+                    color: const Color(0xFFE8C060), size: 48),
+                const SizedBox(height: 12),
+                const Text(
+                  'Neighbourhood Complete!',
+                  style: TextStyle(
+                    fontFamily: 'Georgia',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFFE8C060),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'You\'ve found all doors in $hood!',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFFA08040),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colour,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text(
+                      'Amazing!',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -194,6 +271,12 @@ class _CollectionScreenState extends State<CollectionScreen> {
 
   Widget _buildPage(String hood, List<Door> doors, int foundCount) {
     final colour = _neighbourhoodColour(hood);
+
+    if (foundCount == doors.length && doors.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showCompletionDialog(hood, colour);
+      });
+    }
 
     return Container(
       color: const Color(0xFF1A1208),
