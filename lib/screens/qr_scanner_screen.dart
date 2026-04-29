@@ -27,7 +27,6 @@ class _QrScannerScreenState extends State<QrScannerScreen>
   bool _isDetected = false;
   String? _detectedDoorName;
 
-  // spark animation
   late AnimationController _sparkController;
   late Animation<double> _sparkAnimation;
 
@@ -57,7 +56,6 @@ class _QrScannerScreenState extends State<QrScannerScreen>
     final value = barcode.rawValue;
     if (value == null) return;
 
-    // check if this matches one of our door qr codes
     Door? matchedDoor;
     for (final door in widget.doors) {
       if (door.qrValue == value) {
@@ -74,25 +72,103 @@ class _QrScannerScreenState extends State<QrScannerScreen>
       _detectedDoorName = matchedDoor!.street;
     });
 
-    // haptic feedback - double pulse like a real unlock
     HapticFeedback.heavyImpact();
     await Future.delayed(const Duration(milliseconds: 150));
     HapticFeedback.heavyImpact();
 
-    // spark animation
     _sparkController.forward();
 
-    // save to firestore
     final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
     await _firestoreService.markDoorFound(userId, matchedDoor.id);
 
-    // tell map screen to update
     widget.onDoorScanned(matchedDoor.id);
 
-    // wait then navigate back
+    final isFirstFinder = await _firestoreService.isFirstFinder(matchedDoor.id, userId);
+
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) {
-      Navigator.pop(context);
+      if (isFirstFinder) {
+        showDialog(
+          context: context,
+          builder: (context) => Dialog(
+            backgroundColor: Colors.transparent,
+            child: Container(
+              margin: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1A1208),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                    color: const Color(0xFFE8C060), width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color:
+                        const Color(0xFFE8C060).withValues(alpha: 0.4),
+                    blurRadius: 30,
+                    spreadRadius: 5,
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('🏆',
+                        style: TextStyle(fontSize: 48)),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'First Finder!',
+                      style: TextStyle(
+                        fontFamily: 'Georgia',
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFE8C060),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'You were the first to discover $_detectedDoorName!',
+                      style: const TextStyle(
+                        color: Color(0xFFA08040),
+                        fontSize: 13,
+                        height: 1.5,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE8C060),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Text(
+                          'Claim Badge!',
+                          style: TextStyle(
+                            color: Color(0xFF1A1208),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      } else {
+        Navigator.pop(context);
+      }
     }
   }
 
@@ -102,13 +178,11 @@ class _QrScannerScreenState extends State<QrScannerScreen>
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // camera viewfinder
           MobileScanner(
             controller: _scannerController,
             onDetect: _onDetect,
           ),
 
-          // top bar
           Positioned(
             top: 0,
             left: 0,
@@ -158,7 +232,6 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                     ),
                   ),
                   const Spacer(),
-                  // torch button
                   GestureDetector(
                     onTap: () => _scannerController.toggleTorch(),
                     child: Container(
@@ -180,7 +253,6 @@ class _QrScannerScreenState extends State<QrScannerScreen>
             ),
           ),
 
-          // hint text
           Positioned(
             top: MediaQuery.of(context).padding.top + 70,
             left: 0,
@@ -200,7 +272,6 @@ class _QrScannerScreenState extends State<QrScannerScreen>
             ),
           ),
 
-          // QR finder box in centre
           Center(
             child: AnimatedBuilder(
               animation: _sparkAnimation,
@@ -208,7 +279,6 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                 return Stack(
                   alignment: Alignment.center,
                   children: [
-                    // finder box
                     CustomPaint(
                       size: const Size(220, 220),
                       painter: FinderPainter(
@@ -222,7 +292,6 @@ class _QrScannerScreenState extends State<QrScannerScreen>
             ),
           ),
 
-          // detected confirmation pill
           if (_isDetected && _detectedDoorName != null)
             Positioned(
               bottom: 120,
@@ -235,7 +304,8 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF40E060).withValues(alpha: 0.9),
+                    color:
+                        const Color(0xFF40E060).withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -250,7 +320,6 @@ class _QrScannerScreenState extends State<QrScannerScreen>
               ),
             ),
 
-          // bottom hint
           Positioned(
             bottom: 60,
             left: 0,
@@ -271,7 +340,6 @@ class _QrScannerScreenState extends State<QrScannerScreen>
   }
 }
 
-// draws the QR finder corners and spark effect
 class FinderPainter extends CustomPainter {
   final bool isDetected;
   final double sparkValue;
@@ -280,38 +348,31 @@ class FinderPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final cornerColor = isDetected
-        ? const Color(0xFF40E060)
-        : Colors.white;
+    final cornerColor =
+        isDetected ? const Color(0xFF40E060) : Colors.white;
     final cornerPaint = Paint()
       ..color = cornerColor
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
-    final cornerSize = 28.0;
+    const cornerSize = 28.0;
     final w = size.width;
     final h = size.height;
 
-    // top left
     canvas.drawLine(Offset(0, cornerSize), Offset(0, 0), cornerPaint);
     canvas.drawLine(Offset(0, 0), Offset(cornerSize, 0), cornerPaint);
-
-    // top right
-    canvas.drawLine(Offset(w - cornerSize, 0), Offset(w, 0), cornerPaint);
+    canvas.drawLine(
+        Offset(w - cornerSize, 0), Offset(w, 0), cornerPaint);
     canvas.drawLine(Offset(w, 0), Offset(w, cornerSize), cornerPaint);
-
-    // bottom left
-    canvas.drawLine(Offset(0, h - cornerSize), Offset(0, h), cornerPaint);
+    canvas.drawLine(
+        Offset(0, h - cornerSize), Offset(0, h), cornerPaint);
     canvas.drawLine(Offset(0, h), Offset(cornerSize, h), cornerPaint);
-
-    // bottom right
     canvas.drawLine(
         Offset(w - cornerSize, h), Offset(w, h), cornerPaint);
     canvas.drawLine(
         Offset(w, h - cornerSize), Offset(w, h), cornerPaint);
 
-    // green box outline when detected
     if (isDetected) {
       canvas.drawRect(
         Rect.fromLTWH(0, 0, w, h),
@@ -320,13 +381,10 @@ class FinderPainter extends CustomPainter {
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2,
       );
-
-      // sparks radiating from corners
       if (sparkValue > 0) {
         _drawSparks(canvas, size);
       }
     } else {
-      // scan line animation - just use a simple line
       final scanY = h * (sparkValue == 0 ? 0.5 : sparkValue);
       canvas.drawLine(
         Offset(4, scanY),
@@ -362,10 +420,9 @@ class FinderPainter extends CustomPainter {
       for (final dir in sparkDirections[i]) {
         final length = 20.0 * sparkValue;
         final opacity = (1 - sparkValue).clamp(0.0, 1.0);
-        // alternate yellow and orange sparks
         sparkPaint.color = (i % 2 == 0
-            ? const Color(0xFFFFD700)
-            : const Color(0xFFFF8C00))
+                ? const Color(0xFFFFD700)
+                : const Color(0xFFFF8C00))
             .withValues(alpha: opacity);
         canvas.drawLine(
           corners[i],

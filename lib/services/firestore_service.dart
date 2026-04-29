@@ -116,4 +116,19 @@ class FirestoreService {
       print('error submitting artist suggestion: $e');
     }
   }
+ 
+  // check if this user is the first to find this door
+  Future<bool> isFirstFinder(String doorId, String userId) async {
+    try {
+      final snapshot = await _db
+          .collection('users')
+          .where('foundDoors', arrayContains: doorId)
+          .get();
+      // if only 1 user has found it (this user), they're the first
+      return snapshot.docs.length == 1;
+    } catch (e) {
+      print('error checking first finder: $e');
+      return false;
+    }
+  }
 }
