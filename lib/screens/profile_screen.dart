@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:frames_app/services/firestore_service.dart';
+import 'package:frames_app/screens/badges_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -453,6 +454,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _settingsRow('Friends & Privacy', Icons.lock_outline),
                     _settingsRow('Notifications', Icons.notifications_none),
                     _settingsRow('About Frames', Icons.info_outline),
+                    _settingsRow('Badges & Achievements', Icons.emoji_events_outlined, onTap: () {
+                                 Navigator.push(
+                                   context,
+                             MaterialPageRoute(builder: (_) => const BadgesScreen()),
+                                    );
+                                    }),
                     _settingsRow('Sign Out', Icons.logout,
                         isDestructive: true, onTap: () async {
                       await FirebaseAuth.instance.signOut();
