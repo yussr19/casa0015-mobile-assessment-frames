@@ -98,7 +98,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    _isLoading ? 'opening...' : 'knock to enter',
+                    _isLoading ? 'opening...' : 'knock to enter · v1.0',
                     style: const TextStyle(
                       fontSize: 13,
                       color: Color(0xFF6A5030),
