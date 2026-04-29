@@ -480,17 +480,31 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
                     color: Color(0xFFA08040),
                   ),
                 ),
-                Row(
-                  children: List.generate(5, (i) {
-                    return Icon(
-                      Icons.star,
-                      size: 10,
-                      color: i < 3
-                          ? const Color(0xFFE8C040)
-                          : const Color(0xFF4A3018),
-                    );
-                  }),
-                ),
+              Row(
+  children: [
+    Text(
+      widget.door.rarityLabel,
+      style: TextStyle(
+        fontSize: 8,
+        color: widget.door.rarity == 3
+            ? const Color(0xFFE8C040)
+            : widget.door.rarity == 2
+                ? const Color(0xFFAAAAAA)
+                : const Color(0xFFA08040),
+                    ),
+                      ),
+                           const SizedBox(width: 4),
+                         ...List.generate(3, (i) {
+                             return Icon(
+                       Icons.star,
+                     size: 10,
+                 color: i < widget.door.rarity
+                  ? const Color(0xFFE8C040)
+                 : const Color(0xFF4A3018),
+      );
+    }),
+  ],
+),
               ],
             ),
           ),
