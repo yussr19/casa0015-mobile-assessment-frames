@@ -19,11 +19,9 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
   bool _isFlipped = false;
   Artist? _artist;
   bool _isLoading = true;
-  bool _artworkExpanded = false;
 
   final FirestoreService _firestoreService = FirestoreService();
 
-  // colour based on door neighbourhood
   Color get _doorColour {
     switch (widget.door.neighbourhood) {
       case 'City Centre':
@@ -77,6 +75,30 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
       _flipController.forward();
     }
     setState(() => _isFlipped = !_isFlipped);
+  }
+
+  void _showArtworkFullscreen() {
+    if (_artist?.artworkUrl.isNotEmpty != true) return;
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.black,
+          insetPadding: EdgeInsets.zero,
+          child: GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: SizedBox(
+              width: double.infinity,
+              height: double.infinity,
+              child: Image.network(
+                _artist!.artworkUrl,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -139,7 +161,7 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
               ),
             ),
 
-            // card in centre
+            // card
             Expanded(
               child: Center(
                 child: _isLoading
@@ -153,7 +175,6 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
                           builder: (context, child) {
                             final angle = _flipAnimation.value * 3.14159;
                             final isShowingFront = angle < 1.5708;
-
                             return Transform(
                               transform: Matrix4.identity()
                                 ..setEntry(3, 2, 0.001)
@@ -174,11 +195,13 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
               ),
             ),
 
-            // tap hint
+            // hint
             Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
-                _isFlipped ? 'tap card to see door' : 'tap card to reveal artist',
+                _isFlipped
+                    ? 'tap card to see door'
+                    : 'tap card to reveal artist',
                 style: const TextStyle(
                   fontSize: 11,
                   color: Color(0xFF6A5030),
@@ -190,9 +213,6 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
           ],
         ),
       ),
-
-      // artwork fullscreen overlay
-      extendBody: true,
     );
   }
 
@@ -218,14 +238,11 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
       ),
       child: Stack(
         children: [
-          // door design
           Positioned.fill(
             child: CustomPaint(
               painter: CardDoorPainter(colour: _doorColour),
             ),
           ),
-
-          // street name at bottom
           Positioned(
             bottom: 20,
             left: 16,
@@ -249,8 +266,6 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
               ),
             ),
           ),
-
-          // card number
           Positioned(
             top: 10,
             left: 12,
@@ -262,8 +277,6 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
               ),
             ),
           ),
-
-          // found badge
           Positioned(
             top: 10,
             right: 10,
@@ -303,9 +316,9 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
       ),
       child: Column(
         children: [
-          // coloured header
+          // header
           Container(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
             decoration: BoxDecoration(
               color: _doorColour,
               borderRadius: const BorderRadius.only(
@@ -321,7 +334,6 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
                   style: TextStyle(
                     fontSize: 8,
                     color: Colors.white.withValues(alpha: 0.6),
-                    letterSpacing: 0.5,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -331,7 +343,7 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
                       : 'Artist TBC',
                   style: const TextStyle(
                     fontFamily: 'Georgia',
-                    fontSize: 18,
+                    fontSize: 17,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
@@ -339,7 +351,7 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
                 Text(
                   '${widget.door.street} · Card #${widget.door.id.replaceAll('door_', '')}',
                   style: TextStyle(
-                    fontSize: 9,
+                    fontSize: 8,
                     color: Colors.white.withValues(alpha: 0.6),
                   ),
                 ),
@@ -350,7 +362,7 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
           // body
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -360,29 +372,23 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
                         ? _artist!.bio
                         : 'Artist biography coming soon.',
                     style: const TextStyle(
-                      fontSize: 9,
+                      fontSize: 8.5,
                       color: Color(0xFF3A2A18),
-                      height: 1.5,
+                      height: 1.4,
                     ),
-                    maxLines: 4,
+                    maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                   ),
 
-                  const SizedBox(height: 10),
-                  Container(
-                      height: 0.5,
-                      color: const Color(0xFFDDD4BC)),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 6),
+                  Container(height: 0.5, color: const Color(0xFFDDD4BC)),
+                  const SizedBox(height: 6),
 
-                  // artwork thumbnail
+                  // artwork - tap to expand
                   GestureDetector(
-                    onTap: () {
-                      if (_artist?.artworkUrl.isNotEmpty == true) {
-                        setState(() => _artworkExpanded = true);
-                      }
-                    },
+                    onTap: _showArtworkFullscreen,
                     child: Container(
-                      height: 120,
+                      height: 90,
                       decoration: BoxDecoration(
                         color: _doorColour.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(6),
@@ -395,7 +401,7 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
                               borderRadius: BorderRadius.circular(6),
                               child: Image.network(
                                 _artist!.artworkUrl,
-                                fit: BoxFit.contain,
+                                fit: BoxFit.cover,
                                 alignment: Alignment.topCenter,
                                 width: double.infinity,
                               ),
@@ -407,14 +413,15 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
                                   Icon(
                                     Icons.image_outlined,
                                     color: _doorColour.withValues(alpha: 0.4),
-                                    size: 28,
+                                    size: 24,
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     'Artwork coming soon',
                                     style: TextStyle(
                                       fontSize: 8,
-                                      color: _doorColour.withValues(alpha: 0.5),
+                                      color:
+                                          _doorColour.withValues(alpha: 0.5),
                                     ),
                                   ),
                                 ],
@@ -423,18 +430,26 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
                     ),
                   ),
 
-                  const SizedBox(height: 6),
-                  Container(
-                      height: 0.5,
-                      color: const Color(0xFFDDD4BC)),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'tap image to expand',
+                    style: TextStyle(
+                      fontSize: 7,
+                      color: Color(0xFFAA9980),
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+
+                  const SizedBox(height: 4),
+                  Container(height: 0.5, color: const Color(0xFFDDD4BC)),
+                  const SizedBox(height: 4),
 
                   // style
                   if (_artist?.style.isNotEmpty == true)
                     Text(
                       _artist!.style,
                       style: TextStyle(
-                        fontSize: 9,
+                        fontSize: 8.5,
                         color: _doorColour,
                         fontWeight: FontWeight.w500,
                         fontStyle: FontStyle.italic,
@@ -447,7 +462,7 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
 
           // footer
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: const BoxDecoration(
               color: Color(0xFF2A1A08),
               borderRadius: BorderRadius.only(
@@ -485,7 +500,6 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
   }
 }
 
-// paints a door on the card front
 class CardDoorPainter extends CustomPainter {
   final Color colour;
 
@@ -496,7 +510,6 @@ class CardDoorPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // centre split
     canvas.drawLine(
       Offset(w / 2, 0),
       Offset(w / 2, h),
@@ -505,12 +518,9 @@ class CardDoorPainter extends CustomPainter {
         ..strokeWidth = 2,
     );
 
-    // upper panels
     _drawPanel(canvas, Rect.fromLTWH(12, 20, w / 2 - 18, h * 0.32), colour);
     _drawPanel(
         canvas, Rect.fromLTWH(w / 2 + 6, 20, w / 2 - 18, h * 0.32), colour);
-
-    // lower panels
     _drawPanel(
         canvas,
         Rect.fromLTWH(12, h * 0.32 + 28, w / 2 - 18, h * 0.28),
@@ -520,7 +530,6 @@ class CardDoorPainter extends CustomPainter {
         Rect.fromLTWH(w / 2 + 6, h * 0.32 + 28, w / 2 - 18, h * 0.28),
         colour);
 
-    // knocker
     final cx = w / 2 - 5;
     final cy = h * 0.68;
     canvas.drawCircle(
