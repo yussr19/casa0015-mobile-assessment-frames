@@ -29,16 +29,13 @@ class _BadgesScreenState extends State<BadgesScreen> {
     });
   }
 
-  // check if neighbourhood is complete
   bool _isNeighbourhoodComplete(List<String> doorIds) {
     return doorIds.every((id) => _foundDoorIds.contains(id));
   }
 
-  // check if user has found a legendary door
   bool get _hasLegendary => _foundDoorIds.any(
       (id) => ['door_005', 'door_006', 'door_008'].contains(id));
 
-  // check if user has found a rare door
   bool get _hasRare => _foundDoorIds.any(
       (id) => ['door_002', 'door_004', 'door_007'].contains(id));
 
@@ -133,7 +130,6 @@ class _BadgesScreenState extends State<BadgesScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // header
             Container(
               color: const Color(0xFF2A1A08),
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
@@ -170,7 +166,6 @@ class _BadgesScreenState extends State<BadgesScreen> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  // points total
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 10),
@@ -203,7 +198,6 @@ class _BadgesScreenState extends State<BadgesScreen> {
               ),
             ),
 
-            // badges grid
             Expanded(
               child: _isLoading
                   ? const Center(
@@ -226,80 +220,127 @@ class _BadgesScreenState extends State<BadgesScreen> {
                         final unlocked = badge['unlocked'] as bool;
                         final colour = badge['colour'] as Color;
 
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: unlocked
-                                ? const Color(0xFF2A1A08)
-                                : const Color(0xFF141008),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: unlocked
-                                  ? colour.withValues(alpha: 0.5)
-                                  : const Color(0xFF2A1A08),
-                              width: 1.5,
-                            ),
-                            boxShadow: unlocked
-                                ? [
-                                    BoxShadow(
-                                      color: colour.withValues(alpha: 0.2),
-                                      blurRadius: 8,
-                                      spreadRadius: 1,
-                                    ),
-                                  ]
-                                : null,
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 48,
-                                height: 48,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: unlocked
-                                      ? colour.withValues(alpha: 0.15)
-                                      : const Color(0xFF2A1A08),
-                                ),
-                                child: Icon(
-                                  badge['icon'] as IconData,
-                                  size: 24,
-                                  color: unlocked
-                                      ? colour
-                                      : const Color(0xFF3A2808),
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
-                                child: Text(
-                                  badge['title'] as String,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w600,
+                        return GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                backgroundColor: const Color(0xFF2A1A08),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  side: BorderSide(
                                     color: unlocked
-                                        ? const Color(0xFFE8C060)
+                                        ? colour
                                         : const Color(0xFF3A2808),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 2),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
-                                child: Text(
-                                  unlocked ? 'Unlocked' : 'Locked',
-                                  textAlign: TextAlign.center,
+                                title: Text(
+                                  badge['title'] as String,
                                   style: TextStyle(
-                                    fontSize: 7,
+                                    fontFamily: 'Georgia',
                                     color: unlocked
-                                        ? colour.withValues(alpha: 0.8)
-                                        : const Color(0xFF2A1808),
+                                        ? const Color(0xFFE8C060)
+                                        : const Color(0xFF6A5030),
+                                    fontSize: 16,
                                   ),
                                 ),
+                                content: Text(
+                                  unlocked
+                                      ? '${badge['description']}\n\nUnlocked!'
+                                      : '${badge['description']}\n\nKeep exploring to unlock this badge.',
+                                  style: const TextStyle(
+                                    color: Color(0xFFA08040),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text(
+                                      'OK',
+                                      style:
+                                          TextStyle(color: Color(0xFFE8C060)),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: unlocked
+                                  ? const Color(0xFF2A1A08)
+                                  : const Color(0xFF141008),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: unlocked
+                                    ? colour.withValues(alpha: 0.5)
+                                    : const Color(0xFF2A1A08),
+                                width: 1.5,
+                              ),
+                              boxShadow: unlocked
+                                  ? [
+                                      BoxShadow(
+                                        color: colour.withValues(alpha: 0.2),
+                                        blurRadius: 8,
+                                        spreadRadius: 1,
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: unlocked
+                                        ? colour.withValues(alpha: 0.15)
+                                        : const Color(0xFF2A1A08),
+                                  ),
+                                  child: Icon(
+                                    badge['icon'] as IconData,
+                                    size: 24,
+                                    color: unlocked
+                                        ? colour
+                                        : const Color(0xFF3A2808),
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 4),
+                                  child: Text(
+                                    badge['title'] as String,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w600,
+                                      color: unlocked
+                                          ? const Color(0xFFE8C060)
+                                          : const Color(0xFF3A2808),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 4),
+                                  child: Text(
+                                    unlocked ? 'Unlocked' : 'Locked',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 7,
+                                      color: unlocked
+                                          ? colour.withValues(alpha: 0.8)
+                                          : const Color(0xFF2A1808),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       },
