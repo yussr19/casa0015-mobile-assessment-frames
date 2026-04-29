@@ -270,7 +270,7 @@ class _SplashScreenState extends State<SplashScreen>
                       const SizedBox(height: 3),
                       // knocker ring
                       Container(
-                        width: 50,
+                        width: 52,
                         height: 26,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(13),
