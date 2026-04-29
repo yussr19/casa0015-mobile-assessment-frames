@@ -532,13 +532,12 @@ class LiverpoolCathedralPainter extends CustomPainter {
       canvas.drawPath(windowPath, glowWindowPaint);
       canvas.drawPath(windowPath, linePaint..color = colour.withValues(alpha: 0.6));
     }
-
     // rose window (circular)
-    canvas.drawCircle(
-      Offset(w * 0.50, h * 0.40),
-      w * 0.07,
-      glowWindowPaint,
-    );
+       canvas.drawCircle(
+          Offset(w * 0.50, h * 0.36),
+         w * 0.055,
+        glowWindowPaint,
+        );
     // rose window spokes
     for (int i = 0; i < 8; i++) {
       final angle = i * 3.14159 / 4;
@@ -554,37 +553,30 @@ class LiverpoolCathedralPainter extends CustomPainter {
           ..strokeWidth = 1,
       );
     }
-
-    // crown tower top - distinctive Liverpool Cathedral feature
-    final crownPath = Path();
-    crownPath.moveTo(w * 0.33, h * 0.28);
-    // battlements
-    for (int i = 0; i < 6; i++) {
-      final bx = w * 0.33 + i * w * 0.057;
-      if (i % 2 == 0) {
-        crownPath.lineTo(bx, h * 0.18);
-        crownPath.lineTo(bx + w * 0.028, h * 0.18);
-        crownPath.lineTo(bx + w * 0.028, h * 0.28);
-      } else {
-        crownPath.lineTo(bx, h * 0.28);
-        crownPath.lineTo(bx, h * 0.22);
-        crownPath.lineTo(bx + w * 0.028, h * 0.22);
-        crownPath.lineTo(bx + w * 0.028, h * 0.28);
-      }
-    }
-    crownPath.close();
-    canvas.drawPath(crownPath, stonePaint);
-
-    // pinnacles on crown
-    for (int i = 0; i < 4; i++) {
-      final px = w * 0.36 + i * w * 0.095;
-      final pinnPath = Path();
-      pinnPath.moveTo(px, h * 0.18);
-      pinnPath.lineTo(px - w * 0.015, h * 0.22);
-      pinnPath.lineTo(px + w * 0.015, h * 0.22);
-      pinnPath.close();
-      canvas.drawPath(pinnPath, stonePaint);
-    }
+    // crown battlements - cleaner version
+    final battlementPaint = Paint()..color = const Color(0xFFD4C4A0);
+    // base of crown
+    canvas.drawRect(
+      Rect.fromLTWH(w * 0.33, h * 0.20, w * 0.34, h * 0.08),
+      battlementPaint,
+    );
+    // individual merlons (raised parts)
+     // merlons and connected pinnacles drawn together
+        for (int i = 0; i < 4; i++) {
+        final px = w * 0.355 + i * w * 0.075;
+        // merlon rectangle
+        canvas.drawRect(
+         Rect.fromLTWH(px, h * 0.135, w * 0.038, h * 0.065),
+         battlementPaint,
+           );
+         // pinnacle triangle sitting directly on top of merlon
+           final pinnPath = Path();
+           pinnPath.moveTo(px + w * 0.019, h * 0.075);
+           pinnPath.lineTo(px, h * 0.135);
+           pinnPath.lineTo(px + w * 0.038, h * 0.135);
+          pinnPath.close();
+           canvas.drawPath(pinnPath, battlementPaint);
+           }
 
     // left transept arched windows
     for (int i = 0; i < 2; i++) {
@@ -611,6 +603,9 @@ class LiverpoolCathedralPainter extends CustomPainter {
         glowWindowPaint,
       );
     }
+   
+    
+
 
     // nave clerestory windows
     for (int i = 0; i < 4; i++) {
