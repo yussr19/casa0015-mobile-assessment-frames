@@ -27,7 +27,7 @@ class _ArtistCardScreenState extends State<ArtistCardScreen>
       case 'City Centre':
         return const Color(0xFF8B0000);
       case 'Ropewalks':
-        return const Color(0xFF00006B);
+        return const Color(0xFF6B75D6);
       case 'Baltic Triangle':
         return const Color(0xFF005000);
       case 'Waterfront':
