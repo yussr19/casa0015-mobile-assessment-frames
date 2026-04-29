@@ -39,4 +39,33 @@ class Door {
       
     );
   }
+  // rarity based on door id
+int get rarity {
+  switch (id) {
+    case 'door_001':
+    case 'door_003':
+    case 'door_009':
+      return 1; // common
+    case 'door_002':
+    case 'door_004':
+    case 'door_007':
+      return 2; // rare
+    case 'door_005':
+    case 'door_006':
+    case 'door_008':
+      return 3; // legendary
+    default:
+      return 1;
+  }
+}
+
+// rarity label
+String get rarityLabel {
+  switch (rarity) {
+    case 1: return 'Common';
+    case 2: return 'Rare';
+    case 3: return 'Legendary';
+    default: return 'Common';
+  }
+}
 }
