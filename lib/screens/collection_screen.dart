@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frames_app/models/door_model.dart';
-import 'package:frames_app/services/firestore_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'artist_card_screen.dart';
 
 class CollectionScreen extends StatefulWidget {
@@ -22,7 +20,6 @@ class _CollectionScreenState extends State<CollectionScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  // group doors by neighbourhood
   Map<String, List<Door>> get _doorsByNeighbourhood {
     final Map<String, List<Door>> grouped = {};
     for (final door in widget.doors) {
@@ -33,7 +30,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
 
   List<String> get _neighbourhoods => _doorsByNeighbourhood.keys.toList();
 
- Color _neighbourhoodColour(String hood) {
+  Color _neighbourhoodColour(String hood) {
     switch (hood) {
       case 'City Centre':
         return const Color(0xFF8B0000);
@@ -124,7 +121,30 @@ class _CollectionScreenState extends State<CollectionScreen> {
     );
   }
 
-  
+  String _getDoorHint(String doorId) {
+    switch (doorId) {
+      case 'door_001':
+        return 'A grand entrance on a street that sounds like a chapel in white...';
+      case 'door_002':
+        return 'Climb the hill to find a door that watches over the rooftops...';
+      case 'door_003':
+        return 'Where merchants once traded, a door faces the river...';
+      case 'door_004':
+        return 'On the boldest street in Liverpool, art lives behind this door...';
+      case 'door_005':
+        return 'A knightly entrance on a street fit for a crusade...';
+      case 'door_006':
+        return 'Two streets share the same name — find the one that climbs...';
+      case 'door_007':
+        return 'Named for a holy man, this street hides its secrets well...';
+      case 'door_008':
+        return 'In the triangle where creatives gather, a door waits in Catherine\'s name...';
+      case 'door_009':
+        return 'Where ships once docked and prayers were said, a chapel door remains...';
+      default:
+        return 'Walk the streets of Liverpool to discover this hidden door...';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +153,6 @@ class _CollectionScreenState extends State<CollectionScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // header
             Container(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
               color: const Color(0xFF2A1A08),
@@ -171,8 +190,6 @@ class _CollectionScreenState extends State<CollectionScreen> {
                     ],
                   ),
                   const SizedBox(height: 10),
-
-                  // neighbourhood tabs
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -224,7 +241,6 @@ class _CollectionScreenState extends State<CollectionScreen> {
               ),
             ),
 
-            // sticker book pages
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
@@ -236,13 +252,11 @@ class _CollectionScreenState extends State<CollectionScreen> {
                   final foundCount = doors
                       .where((d) => widget.foundDoorIds.contains(d.id))
                       .length;
-
                   return _buildPage(hood, doors, foundCount);
                 },
               ),
             ),
 
-            // page dots
             Container(
               color: const Color(0xFF1A1208),
               padding: const EdgeInsets.symmetric(vertical: 10),
@@ -282,7 +296,6 @@ class _CollectionScreenState extends State<CollectionScreen> {
       color: const Color(0xFF1A1208),
       child: Column(
         children: [
-          // neighbourhood header
           Container(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: Row(
@@ -306,42 +319,41 @@ class _CollectionScreenState extends State<CollectionScreen> {
                   ),
                 ),
                 const Spacer(),
-               Row(
-                children: [
-                     if (foundCount == doors.length && doors.isNotEmpty)
+                Row(
+                  children: [
+                    if (foundCount == doors.length && doors.isNotEmpty)
                       Container(
-        margin: const EdgeInsets.only(right: 6),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 8,
-          vertical: 2,
-           ),
-        decoration: BoxDecoration(
-          color: const Color(0xFFE8C060),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: const Text(
-          'COMPLETE',
-          style: TextStyle(
-            fontSize: 8,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF2A1A08),
-                 ),
-                  ),
-                  ),
-                   Text(
-                  '$foundCount / ${doors.length}',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: Color(0xFFA08040),
+                        margin: const EdgeInsets.only(right: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
                         ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE8C060),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        ],
+                        child: const Text(
+                          'COMPLETE',
+                          style: TextStyle(
+                            fontSize: 8,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF2A1A08),
+                          ),
                         ),
+                      ),
+                    Text(
+                      '$foundCount / ${doors.length}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFFA08040),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
 
-          // progress bar
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
             child: ClipRRect(
@@ -355,7 +367,6 @@ class _CollectionScreenState extends State<CollectionScreen> {
             ),
           ),
 
-          // sticker grid
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -385,13 +396,48 @@ class _CollectionScreenState extends State<CollectionScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => ArtistCardScreen(
-                    door: door,
-                  ),
+                  builder: (_) => ArtistCardScreen(door: door),
                 ),
               );
             }
-          : null,
+          : () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  backgroundColor: const Color(0xFF2A1A08),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: const BorderSide(color: Color(0xFF4A3018)),
+                  ),
+                  title: const Text(
+                    'Hidden Door',
+                    style: TextStyle(
+                      fontFamily: 'Georgia',
+                      color: Color(0xFFE8C060),
+                      fontSize: 16,
+                    ),
+                  ),
+                  content: Text(
+                    _getDoorHint(door.id),
+                    style: const TextStyle(
+                      color: Color(0xFFA08040),
+                      fontSize: 12,
+                      height: 1.5,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        'Got it',
+                        style: TextStyle(color: Color(0xFFE8C060)),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
       child: Column(
         children: [
           Expanded(
@@ -450,7 +496,6 @@ class _CollectionScreenState extends State<CollectionScreen> {
   }
 }
 
-// door shaped sticker painter
 class DoorStickerPainter extends CustomPainter {
   final bool isFound;
   final Color colour;
@@ -470,7 +515,6 @@ class DoorStickerPainter extends CustomPainter {
     final bgColour = isFound ? colour : const Color(0xFF2A1A08);
     final borderColour = isFound ? colour : const Color(0xFF3A2808);
 
-    // door background
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         Rect.fromLTWH(0, 0, w, h),
@@ -479,7 +523,6 @@ class DoorStickerPainter extends CustomPainter {
       Paint()..color = bgColour.withValues(alpha: isFound ? 0.9 : 0.5),
     );
 
-    // door border
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         Rect.fromLTWH(0, 0, w, h),
@@ -491,7 +534,6 @@ class DoorStickerPainter extends CustomPainter {
         ..strokeWidth = 1.5,
     );
 
-    // centre split line
     canvas.drawLine(
       Offset(w / 2, 0),
       Offset(w / 2, h),
@@ -501,12 +543,9 @@ class DoorStickerPainter extends CustomPainter {
     );
 
     if (isFound) {
-      // upper panels
       _drawPanel(canvas, Rect.fromLTWH(4, 6, w / 2 - 6, h * 0.35), colour);
       _drawPanel(
           canvas, Rect.fromLTWH(w / 2 + 2, 6, w / 2 - 6, h * 0.35), colour);
-
-      // lower panels
       _drawPanel(
           canvas,
           Rect.fromLTWH(4, h * 0.35 + 8, w / 2 - 6, h * 0.35),
@@ -516,7 +555,6 @@ class DoorStickerPainter extends CustomPainter {
           Rect.fromLTWH(w / 2 + 2, h * 0.35 + 8, w / 2 - 6, h * 0.35),
           colour);
 
-      // knocker
       canvas.drawCircle(
         Offset(w / 2 - 4, h * 0.76),
         5,
@@ -533,7 +571,6 @@ class DoorStickerPainter extends CustomPainter {
           ..strokeWidth = 1,
       );
 
-      // tick badge
       canvas.drawCircle(
         Offset(w - 8, 8),
         7,
@@ -553,7 +590,6 @@ class DoorStickerPainter extends CustomPainter {
           ..strokeJoin = StrokeJoin.round,
       );
     } else {
-      // question mark for undiscovered
       final textPainter = TextPainter(
         text: const TextSpan(
           text: '?',
@@ -574,17 +610,15 @@ class DoorStickerPainter extends CustomPainter {
         ),
       );
 
-      // dashed border for undiscovered
-      final dashPaint = Paint()
-        ..color = const Color(0xFF3A2808)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1;
       canvas.drawRRect(
         RRect.fromRectAndRadius(
           Rect.fromLTWH(2, 2, w - 4, h - 4),
           const Radius.circular(3),
         ),
-        dashPaint,
+        Paint()
+          ..color = const Color(0xFF3A2808)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1,
       );
     }
   }
