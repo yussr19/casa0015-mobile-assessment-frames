@@ -72,25 +72,34 @@ class _MapScreenState extends State<MapScreen>
     _buildMarkers();
   }
 
-  void _buildMarkers() {
+     void _buildMarkers() {
     final Set<Marker> markers = {};
+    const String doorOfTheWeek = 'door_005';
 
     for (final door in _doors) {
       final bool isFound = _foundDoorIds.contains(door.id);
+      final bool isDoW = door.id == doorOfTheWeek;
       markers.add(
         Marker(
           markerId: MarkerId(door.id),
           position: LatLng(door.lat, door.lng),
-          icon: isFound
+          icon: isDoW
               ? BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueOrange)
-              : BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueAzure),
+                  BitmapDescriptor.hueYellow)
+              : isFound
+                  ? BitmapDescriptor.defaultMarkerWithHue(
+                      BitmapDescriptor.hueOrange)
+                  : BitmapDescriptor.defaultMarkerWithHue(
+                      BitmapDescriptor.hueAzure),
           infoWindow: InfoWindow(
-            title: isFound ? door.street : 'Hidden Door',
-            snippet: isFound
-                ? '${door.neighbourhood} - tap to view artist'
-                : 'Walk here to unlock this door',
+            title: isDoW
+                ? 'Door of the Week - ${door.street}'
+                : isFound ? door.street : 'Hidden Door',
+            snippet: isDoW
+                ? 'Featured this week - ${door.neighbourhood}'
+                : isFound
+                    ? '${door.neighbourhood} - tap to view artist'
+                    : 'Walk here to unlock this door',
           ),
           onTap: isFound
     ? () {
