@@ -33,6 +33,21 @@ class _MapScreenState extends State<MapScreen>
   late AnimationController _radarController;
   late Animation<double> _radarAnimation;
 
+  bool get _isNearUndiscoveredDoor {
+    if (_currentPosition == null) return false;
+    for (final door in _doors) {
+      if (_foundDoorIds.contains(door.id)) continue;
+      final distance = Geolocator.distanceBetween(
+        _currentPosition!.latitude,
+        _currentPosition!.longitude,
+        door.lat,
+        door.lng,
+      );
+      if (distance < 100) return true;
+    }
+    return false;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -72,7 +87,7 @@ class _MapScreenState extends State<MapScreen>
     _buildMarkers();
   }
 
-     void _buildMarkers() {
+  void _buildMarkers() {
     final Set<Marker> markers = {};
     const String doorOfTheWeek = 'door_005';
 
@@ -102,20 +117,19 @@ class _MapScreenState extends State<MapScreen>
                     : 'Walk here to unlock this door',
           ),
           onTap: isFound
-    ? () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ArtistCardScreen(door: door),
-          ),
-        );
-      }
-    : null,
+              ? () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ArtistCardScreen(door: door),
+                    ),
+                  );
+                }
+              : null,
         ),
       );
     }
 
-    // green dot for user position
     if (_currentPosition != null) {
       markers.add(
         Marker(
@@ -135,6 +149,12 @@ class _MapScreenState extends State<MapScreen>
     setState(() {
       _markers = markers;
     });
+
+    // update radar speed based on proximity
+    _radarController.duration = Duration(
+      milliseconds: _isNearUndiscoveredDoor ? 800 : 2000,
+    );
+    _radarController.repeat();
   }
 
   void _getCurrentLocation() async {
@@ -189,6 +209,7 @@ class _MapScreenState extends State<MapScreen>
                   return CustomPaint(
                     painter: RadarPainter(
                       animationValue: _radarAnimation.value,
+                      isNearDoor: _isNearUndiscoveredDoor,
                     ),
                   );
                 },
@@ -276,6 +297,47 @@ class _MapScreenState extends State<MapScreen>
               ),
             ),
           ),
+
+          // proximity alert banner
+          if (_isNearUndiscoveredDoor)
+            Positioned(
+              bottom: 80,
+              left: 20,
+              right: 20,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8C060),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFE8C060).withValues(alpha: 0.4),
+                      blurRadius: 12,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.door_front_door,
+                        color: Color(0xFF2A1A08), size: 16),
+                    SizedBox(width: 8),
+                    Text(
+                      'A door is nearby — keep exploring!',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2A1A08),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
 
@@ -407,27 +469,31 @@ class _MapScreenState extends State<MapScreen>
 
 class RadarPainter extends CustomPainter {
   final double animationValue;
+  final bool isNearDoor;
 
-  RadarPainter({required this.animationValue});
+  RadarPainter({required this.animationValue, this.isNearDoor = false});
 
   @override
   void paint(Canvas canvas, Size size) {
     final centre = Offset(size.width / 2, size.height / 2);
     final maxRadius = size.width * 0.45;
+    final colour = isNearDoor
+        ? const Color(0xFFE8C060)
+        : const Color(0xFF8B4A10);
 
     for (int i = 0; i < 2; i++) {
       double progress = (animationValue + i * 0.5) % 1.0;
       double radius = maxRadius * progress;
-      double opacity = (1 - progress) * 0.35;
+      double opacity = (1 - progress) * (isNearDoor ? 0.6 : 0.35);
 
       if (opacity > 0) {
         canvas.drawCircle(
           centre,
           radius,
           Paint()
-            ..color = const Color(0xFF8B4A10).withValues(alpha: opacity)
+            ..color = colour.withValues(alpha: opacity)
             ..style = PaintingStyle.stroke
-            ..strokeWidth = 2.5,
+            ..strokeWidth = isNearDoor ? 4 : 2.5,
         );
       }
     }
@@ -435,11 +501,12 @@ class RadarPainter extends CustomPainter {
     canvas.drawCircle(
       centre,
       maxRadius * 0.15,
-      Paint()..color = const Color(0xFF8B4A10).withValues(alpha: 0.05),
+      Paint()..color = colour.withValues(alpha: 0.05),
     );
   }
 
   @override
   bool shouldRepaint(covariant RadarPainter oldDelegate) =>
-      oldDelegate.animationValue != animationValue;
+      oldDelegate.animationValue != animationValue ||
+      oldDelegate.isNearDoor != isNearDoor;
 }
